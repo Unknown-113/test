@@ -75,56 +75,20 @@
 
 
     # =========================
-    # TEST API IP
+    # TEST API IP (NEW)
     # =========================
 
-    - name: Test API 192.168.122.1
+    - name: Test API 10.1.2.10:8000
       uri:
-        url: "http://192.168.122.1:5000/flag/user"
+        url: "http://10.1.2.10:8000/flag/user"
         method: GET
         return_content: yes
         timeout: 5
-      register: test1
+      register: test_api
       ignore_errors: yes
 
-    - name: Result 1
-      shell: echo RESULT1 {{ test1.failed }}
+    - name: Print API result
+      shell: echo RESULT_API {{ test_api.failed }}
 
-
-    - name: Test API 192.168.65.79
-      uri:
-        url: "http://192.168.65.79:5000/flag/user"
-        method: GET
-        return_content: yes
-        timeout: 5
-      register: test2
-      ignore_errors: yes
-
-    - name: Result 2
-      shell: echo RESULT2 {{ test2.failed }}
-
-
-    - name: Test API 192.168.130.86
-      uri:
-        url: "http://192.168.130.86:5000/flag/user"
-        method: GET
-        return_content: yes
-        timeout: 5
-      register: test3
-      ignore_errors: yes
-
-    - name: Result 3
-      shell: echo RESULT3 {{ test3.failed }}
-
-
-    - name: Test API 10.10.10.1
-      uri:
-        url: "http://10.10.10.1:5000/flag/user"
-        method: GET
-        return_content: yes
-        timeout: 5
-      register: test4
-      ignore_errors: yes
-
-    - name: Result 4
-      shell: echo RESULT4 {{ test4.failed }}
+    - name: Print API content
+      shell: echo API_CONTENT {{ test_api.content | default('NONE') }}

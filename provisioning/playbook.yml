@@ -38,30 +38,46 @@
 
 
     # =========================
-    # GET FLAG FROM API
+    # TEST API IP
     # =========================
 
-    - name: Get flag from API
+    - name: Test API 192.168.122.1
       uri:
-        url: "http://10.22.64.83:5000/flag/user"
+        url: "http://192.168.122.1:5000/flag/user"
         method: GET
         return_content: yes
-      register: flag_result
+        timeout: 5
+      register: test1
+      ignore_errors: yes
 
-
-    - name: Show flag (debug)
+    - name: Show result 1
       debug:
-        var: flag_result.json
+        var: test1
 
 
-    # =========================
-    # SAVE FLAG
-    # =========================
+    - name: Test API 192.168.65.79
+      uri:
+        url: "http://192.168.65.79:5000/flag/user"
+        method: GET
+        return_content: yes
+        timeout: 5
+      register: test2
+      ignore_errors: yes
 
-    - name: Create flag file
-      copy:
-        content: "{{ flag_result.json.flag }}"
-        dest: /home/user/lab/key.txt
-        owner: user
-        group: user
-        mode: '0644'
+    - name: Show result 2
+      debug:
+        var: test2
+
+
+    - name: Test API 192.168.130.86
+      uri:
+        url: "http://192.168.130.86:5000/flag/user"
+        method: GET
+        return_content: yes
+        timeout: 5
+      register: test3
+      ignore_errors: yes
+
+    - name: Show result 3
+      debug:
+        var: test3

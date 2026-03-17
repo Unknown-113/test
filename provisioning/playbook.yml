@@ -1,94 +1,37 @@
-- hosts: student-vm
+- hosts: server
   become: yes
-
   tasks:
 
-    - name: PLAYBOOK START
-      shell: echo PLAYBOOK_RUNNING_ABC
-
-
-    # =========================
-    # USER + SSH
-    # =========================
-
-    - name: Ensure user exists
-      user:
-        name: user
-        shell: /bin/bash
-        create_home: yes
-        password: "{{ 'user' | password_hash('sha512') }}"
-
-    - name: Install SSH server
-      apt:
-        name: openssh-server
-        state: present
+    - apt:
+        name: python3-pip
         update_cache: yes
 
-    - name: Enable password SSH login
-      lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: '^PasswordAuthentication'
-        line: 'PasswordAuthentication yes'
+    - pip:
+        name: flask
 
-    - name: Restart SSH
-      service:
-        name: ssh
-        state: restarted
-        enabled: yes
+    - copy:
+        dest: /root/api.py
+        content: |
+          from flask import Flask, jsonify
+          import random,time
 
+          app = Flask(__name__)
 
-    # =========================
-    # CREATE LAB
-    # =========================
+          flag="FLAG0"
+          t=0
 
-    - name: Create lab folder
-      file:
-        path: /home/user/lab
-        state: directory
-        owner: user
-        group: user
-        mode: '0755'
+          def getflag():
+              global flag,t
+              if time.time()-t>30:
+                  flag="FLAG_"+str(random.randint(1000,9999))
+                  t=time.time()
+              return flag
 
+          @app.route("/flag/user")
+          def f():
+              return jsonify({"flag":getflag()})
 
-    # =========================
-    # SHOW IP
-    # =========================
+          if __name__=="__main__":
+              app.run(host="0.0.0.0",port=8000)
 
-    - name: Show IP
-      shell: ip a
-      register: ip_result
-
-    - name: Print IP
-      shell: echo "{{ ip_result.stdout }}"
-
-
-    # =========================
-    # SHOW ROUTE
-    # =========================
-
-    - name: Show route
-      shell: ip route
-      register: route_result
-
-    - name: Print route
-      shell: echo "{{ route_result.stdout }}"
-
-
-    # =========================
-    # TEST API IP (NEW)
-    # =========================
-
-    - name: Test API 10.1.2.10:8000
-      uri:
-        url: "http://10.1.2.10:8000/flag/user"
-        method: GET
-        return_content: yes
-        timeout: 5
-      register: test_api
-      ignore_errors: yes
-
-    - name: Print API result
-      shell: echo RESULT_API {{ test_api.failed }}
-
-    - name: Print API content
-      shell: echo API_CONTENT {{ test_api.content | default('NONE') }}
+    - shell: nohup python3 /root/api.py &

@@ -1,0 +1,67 @@
+- hosts: student-vm
+  become: yes
+
+  tasks:
+
+    - name: Ensure user exists
+      user:
+        name: user
+        shell: /bin/bash
+        create_home: yes
+        password: "{{ 'user' | password_hash('sha512') }}"
+
+    - name: Install SSH server
+      apt:
+        name: openssh-server
+        state: present
+        update_cache: yes
+
+    - name: Enable password SSH login
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PasswordAuthentication'
+        line: 'PasswordAuthentication yes'
+
+    - name: Restart SSH
+      service:
+        name: ssh
+        state: restarted
+        enabled: yes
+
+    - name: Create lab folder
+      file:
+        path: /home/user/lab
+        state: directory
+        owner: user
+        group: user
+        mode: '0755'
+
+
+    # =========================
+    # GET FLAG FROM API
+    # =========================
+
+    - name: Get flag from API
+      uri:
+        url: "http://10.22.64.83:5000/flag/user"
+        method: GET
+        return_content: yes
+      register: flag_result
+
+
+    - name: Show flag (debug)
+      debug:
+        var: flag_result.json
+
+
+    # =========================
+    # SAVE FLAG
+    # =========================
+
+    - name: Create flag file
+      copy:
+        content: "{{ flag_result.json.flag }}"
+        dest: /home/user/lab/key.txt
+        owner: user
+        group: user
+        mode: '0644'

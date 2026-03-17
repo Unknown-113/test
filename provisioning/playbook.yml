@@ -1,15 +1,23 @@
+########################################
+# SERVER - chạy API
+########################################
+
 - hosts: server
   become: yes
+
   tasks:
 
-    - apt:
+    - name: Install python + pip
+      apt:
         name: python3-pip
         update_cache: yes
 
-    - pip:
+    - name: Install flask
+      pip:
         name: flask
 
-    - copy:
+    - name: Copy API
+      copy:
         dest: /root/api.py
         content: |
           from flask import Flask, jsonify
@@ -34,4 +42,86 @@
           if __name__=="__main__":
               app.run(host="0.0.0.0",port=8000)
 
-    - shell: nohup python3 /root/api.py &
+    - name: Run API
+      shell: nohup python3 /root/api.py &
+      async: 5
+      poll: 0
+
+
+
+########################################
+# STUDENT VM
+########################################
+
+- hosts: student-vm
+  become: yes
+
+  tasks:
+
+    - name: Ensure user exists
+      user:
+        name: user
+        shell: /bin/bash
+        create_home: yes
+        password: "{{ 'user' | password_hash('sha512') }}"
+
+    - name: Install SSH server
+      apt:
+        name: openssh-server
+        state: present
+        update_cache: yes
+
+    - name: Enable password SSH login
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PasswordAuthentication'
+        line: 'PasswordAuthentication yes'
+
+    - name: Restart SSH
+      service:
+        name: ssh
+        state: restarted
+        enabled: yes
+
+
+    #################################
+    # LAB FOLDER
+    #################################
+
+    - name: Create lab folder
+      file:
+        path: /home/user/lab
+        state: directory
+        owner: user
+        group: user
+        mode: '0755'
+
+
+    #################################
+    # CALL API
+    #################################
+
+    - name: Get flag from API
+      uri:
+        url: "http://10.10.10.20:8000/flag/user"
+        method: GET
+        return_content: yes
+      register: api_result
+
+
+    - name: Extract flag
+      set_fact:
+        flag_value: "{{ api_result.json.flag }}"
+
+
+    #################################
+    # WRITE FLAG FILE
+    #################################
+
+    - name: Create key.txt with API flag
+      copy:
+        content: "{{ flag_value }}"
+        dest: /home/user/lab/key.txt
+        owner: user
+        group: user
+        mode: '0644'

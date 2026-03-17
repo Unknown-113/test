@@ -1,14 +1,14 @@
 {
-  "title": "One Access Phase",
+  "title": "Flag Training",
   "state": "UNRELEASED",
+
   "phases": [
     {
       "title": "Access",
       "phase_type": "ACCESS",
       "order": 0,
       "passkey": "start",
-      "cloud_content": "Access sandbox",
-      "local_content": "Local not supported"
+      "cloud_content": "Access sandbox"
     },
 
     {
@@ -18,13 +18,15 @@
 
       "tasks": [
         {
-          "title": "Find the flag",
-          "question": "Find the flag in /home/user/lab/key.txt",
+          "title": "Find flag",
+          "content": "Find flag in /home/user/lab/key.txt",
+          "order": 0,
 
-          "answer": {
-            "type": "COMMAND",
-            "command": "cat /home/user/lab/key.txt"
-          }
+          "answer": "",
+
+          "solution": "",
+
+          "modify_sandbox": false
         }
       ]
     }

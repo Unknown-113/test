@@ -1,20 +1,28 @@
 ########################################
-# SERVER - chạy API
+# ALL MACHINES
 ########################################
 
-- hosts: server
+- hosts: all
   become: yes
 
   tasks:
+
+  ########################################
+  # SERVER - chạy API
+  ########################################
 
     - name: Install python + pip
       apt:
         name: python3-pip
         update_cache: yes
+      when: inventory_hostname == "server"
+
 
     - name: Install flask
       pip:
         name: flask
+      when: inventory_hostname == "server"
+
 
     - name: Copy API
       copy:
@@ -41,22 +49,19 @@
 
           if __name__=="__main__":
               app.run(host="0.0.0.0",port=8000)
+      when: inventory_hostname == "server"
+
 
     - name: Run API
       shell: nohup python3 /root/api.py &
       async: 5
       poll: 0
+      when: inventory_hostname == "server"
 
 
-
-########################################
-# STUDENT VM
-########################################
-
-- hosts: student-vm
-  become: yes
-
-  tasks:
+  ########################################
+  # STUDENT VM
+  ########################################
 
     - name: Ensure user exists
       user:
@@ -64,24 +69,31 @@
         shell: /bin/bash
         create_home: yes
         password: "{{ 'user' | password_hash('sha512') }}"
+      when: inventory_hostname == "student-vm"
+
 
     - name: Install SSH server
       apt:
         name: openssh-server
         state: present
         update_cache: yes
+      when: inventory_hostname == "student-vm"
+
 
     - name: Enable password SSH login
       lineinfile:
         path: /etc/ssh/sshd_config
         regexp: '^PasswordAuthentication'
         line: 'PasswordAuthentication yes'
+      when: inventory_hostname == "student-vm"
+
 
     - name: Restart SSH
       service:
         name: ssh
         state: restarted
         enabled: yes
+      when: inventory_hostname == "student-vm"
 
 
     #################################
@@ -95,6 +107,7 @@
         owner: user
         group: user
         mode: '0755'
+      when: inventory_hostname == "student-vm"
 
 
     #################################
@@ -107,11 +120,13 @@
         method: GET
         return_content: yes
       register: api_result
+      when: inventory_hostname == "student-vm"
 
 
     - name: Extract flag
       set_fact:
         flag_value: "{{ api_result.json.flag }}"
+      when: inventory_hostname == "student-vm"
 
 
     #################################
@@ -125,3 +140,4 @@
         owner: user
         group: user
         mode: '0644'
+      when: inventory_hostname == "student-vm"

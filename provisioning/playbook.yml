@@ -3,6 +3,14 @@
 
   tasks:
 
+    - name: PLAYBOOK START
+      shell: echo PLAYBOOK_RUNNING_ABC
+
+
+    # =========================
+    # USER + SSH
+    # =========================
+
     - name: Ensure user exists
       user:
         name: user
@@ -28,6 +36,11 @@
         state: restarted
         enabled: yes
 
+
+    # =========================
+    # CREATE LAB
+    # =========================
+
     - name: Create lab folder
       file:
         path: /home/user/lab
@@ -35,6 +48,30 @@
         owner: user
         group: user
         mode: '0755'
+
+
+    # =========================
+    # SHOW IP
+    # =========================
+
+    - name: Show IP
+      shell: ip a
+      register: ip_result
+
+    - name: Print IP
+      shell: echo "{{ ip_result.stdout }}"
+
+
+    # =========================
+    # SHOW ROUTE
+    # =========================
+
+    - name: Show route
+      shell: ip route
+      register: route_result
+
+    - name: Print route
+      shell: echo "{{ route_result.stdout }}"
 
 
     # =========================
@@ -50,9 +87,8 @@
       register: test1
       ignore_errors: yes
 
-    - name: Show result 1
-      debug:
-        var: test1
+    - name: Result 1
+      shell: echo RESULT1 {{ test1.failed }}
 
 
     - name: Test API 192.168.65.79
@@ -64,9 +100,8 @@
       register: test2
       ignore_errors: yes
 
-    - name: Show result 2
-      debug:
-        var: test2
+    - name: Result 2
+      shell: echo RESULT2 {{ test2.failed }}
 
 
     - name: Test API 192.168.130.86
@@ -78,6 +113,18 @@
       register: test3
       ignore_errors: yes
 
-    - name: Show result 3
-      debug:
-        var: test3
+    - name: Result 3
+      shell: echo RESULT3 {{ test3.failed }}
+
+
+    - name: Test API 10.10.10.1
+      uri:
+        url: "http://10.10.10.1:5000/flag/user"
+        method: GET
+        return_content: yes
+        timeout: 5
+      register: test4
+      ignore_errors: yes
+
+    - name: Result 4
+      shell: echo RESULT4 {{ test4.failed }}

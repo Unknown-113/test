@@ -44,3 +44,8 @@ groups:
   - name: user-accessible
     nodes:
       - student-vm
+
+  - name: all-machines
+    nodes:
+      - student-vm
+      - server

@@ -17,10 +17,14 @@
       "phase_type": "TRAINING",
       "order": 1,
 
-      "decisionMatrix": [
+      "decision_matrix": [
         {
-          "wrongAnswerLimit": 3,
-          "nextPhase": null
+          "order": 0,
+          "wrong_answers": 3,
+          "solution_displayed": 0,
+          "completed_in_time": 1,
+          "keyword_used": 0,
+          "questionnaire_answered": 0
         }
       ],
 

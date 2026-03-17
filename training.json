@@ -8,7 +8,8 @@
       "phase_type": "ACCESS",
       "order": 0,
       "passkey": "start",
-      "cloud_content": "Access sandbox"
+      "cloud_content": "Access sandbox",
+      "local_content": "Access sandbox"
     },
 
     {
@@ -16,15 +17,17 @@
       "phase_type": "TRAINING",
       "order": 1,
 
+      "decisionMatrix": [],
+
       "tasks": [
         {
           "title": "Find flag",
           "content": "Find flag in /home/user/lab/key.txt",
           "order": 0,
 
-          "answer": "",
+          "answer": "FLAG",
 
-          "solution": "",
+          "solution": "Use cat /home/user/lab/key.txt",
 
           "modify_sandbox": false
         }

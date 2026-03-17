@@ -41,6 +41,7 @@ router_mappings:
 
 
 groups:
+
   - name: user-accessible
     nodes:
       - student-vm
@@ -49,3 +50,4 @@ groups:
     nodes:
       - student-vm
       - server
+      - lab-router

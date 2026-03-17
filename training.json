@@ -17,7 +17,12 @@
       "phase_type": "TRAINING",
       "order": 1,
 
-      "decision_matrix": [],
+      "decisionMatrix": [
+        {
+          "wrongAnswerLimit": 3,
+          "nextPhase": null
+        }
+      ],
 
       "tasks": [
         {

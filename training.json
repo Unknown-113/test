@@ -17,7 +17,7 @@
       "phase_type": "TRAINING",
       "order": 1,
 
-      "decisionMatrix": [],
+      "decision_matrix": [],
 
       "tasks": [
         {
@@ -27,7 +27,7 @@
 
           "answer": "FLAG",
 
-          "solution": "Use cat /home/user/lab/key.txt",
+          "solution": "cat /home/user/lab/key.txt",
 
           "modify_sandbox": false
         }
